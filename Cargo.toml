@@ -1,0 +1,22 @@
+[package]
+name = "bae_mod"
+description = "The Modifiers developed for the Broad Audio Engine."
+repository = "https://github.com/ChylerDev/BAE_Mod"
+license = "MIT"
+version = "0.14.0" # don't forget to fix version numbers in README.md documentation links
+authors = ["Chyler Morrison <contact@chyler.info>"]
+edition = "2018"
+keywords = [ "audio", "audio-processing" ]
+categories = [ "multimedia::audio" ]
+
+[badges]
+is-it-maintained-issue-resolution = { repository = "ChylerDev/BAE" }
+is-it-maintained-open-issues = { repository = "ChylerDev/BAE" }
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+bae_types = { git = "https://github.com/ChylerDev/BAE_Types.git", branch = "dev" }
+version-sync = "0.9"
+
+[dev-dependencies]
+bae_debug = { git = "https://github.com/ChylerDev/BAE_Debug.git", branch = "dev" }
