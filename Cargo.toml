@@ -19,4 +19,4 @@ bae_types = { git = "https://github.com/ChylerDev/BAE_Types.git", branch = "dev"
 version-sync = "0.9"
 
 [dev-dependencies]
-bae_debug = { git = "https://github.com/ChylerDev/BAE_Debug.git", branch = "dev" }
+bae_debug = { git = "https://github.com/ChylerDev/BAE_Debug.git", branch = "master" }
