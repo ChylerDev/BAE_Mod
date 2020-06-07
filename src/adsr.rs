@@ -1,7 +1,7 @@
 //! # ADSR
 
 use super::*;
-use crate::utils::*;
+
 use std::time::Duration;
 
 /// Enum of the states an ADSR filter exists in.

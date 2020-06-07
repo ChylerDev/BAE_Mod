@@ -16,9 +16,9 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 bae_types = { git = "https://github.com/ChylerDev/BAE_Types.git", branch = "master" }
+bae_utils = { git = "https://github.com/ChylerDev/BAE_Utils", branch = "dev" }
 
 [dev-dependencies]
 bae_debug = { git = "https://github.com/ChylerDev/BAE_Debug.git", branch = "master" }
 bae_gen = { git = "https://github.com/ChylerDev/BAE_Gen.git", branch = "dev" }
-bae_utils = { git = "https://github.com/ChylerDev/BAE_Utils.git", branch = "master" }
 version-sync = "0.9"
