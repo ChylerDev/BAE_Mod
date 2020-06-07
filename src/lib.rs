@@ -6,6 +6,8 @@
 #![warn(missing_docs)]
 #![doc(html_root_url = "https://docs.rs/bae_mod/0.14.0")]
 
+use bae_types::*;
+
 pub mod adsr;
 pub mod bandpass;
 pub mod delay;

@@ -1,6 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use bae_rs::{generators::*, modifiers::*, utils::*, *};
+    use bae_mod::*;
+    use bae_gen::*;
+    use bae_types::*;
+    use bae_utils::*;
+
     use std::fs::File;
     use std::time::Duration;
 
