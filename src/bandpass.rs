@@ -4,15 +4,15 @@ use super::*;
 
 /// -12dB per octave BandPass filter.
 pub struct BandPass {
-    coeffs: [MathT; 3],
+    coeffs: [Math; 3],
 
-    xn: [SampleT; 2],
-    yn: [SampleT; 2],
+    xn: [Sample; 2],
+    yn: [Sample; 2],
 
-    sample_rate: MathT,
+    sample_rate: Math,
 
-    central_f: MathT,
-    quality: MathT,
+    central_f: Math,
+    quality: Math,
 }
 
 impl BandPass {
@@ -21,7 +21,7 @@ impl BandPass {
     ///
     /// The filter's quality is set to the central frequency divided by the
     /// difference between the corner frequencies.
-    pub fn new(f: MathT, q: MathT, sample_rate: MathT) -> Self {
+    pub fn new(f: Math, q: Math, sample_rate: Math) -> Self {
         let mut bp = BandPass {
             coeffs: [Default::default(); 3],
 
@@ -40,7 +40,7 @@ impl BandPass {
     }
 
     /// Creates a new BandPass object from given corner frequencies.
-    pub fn from_corners(f: (MathT, MathT), sample_rate: MathT) -> Self {
+    pub fn from_corners(f: (Math, Math), sample_rate: Math) -> Self {
         let mut bp = BandPass {
             coeffs: [Default::default(); 3],
 
@@ -49,8 +49,8 @@ impl BandPass {
 
             sample_rate,
 
-            central_f: (f.0 * f.1).abs().sqrt(),
-            quality: (f.0 * f.1).abs().sqrt() / (f.1 - f.0).abs(),
+            central_f: (f.0 .0 * f.1 .0).abs().sqrt().into(),
+            quality: ((f.0 .0 * f.1 .0).abs().sqrt() / (f.1 .0 - f.0 .0).abs()).into(),
         };
 
         bp.reset();
@@ -59,19 +59,19 @@ impl BandPass {
     }
 
     /// Returns the central frequency of the filter.
-    pub fn get_central_frequency(&self) -> MathT {
+    pub fn get_central_frequency(&self) -> Math {
         self.central_f
     }
 
     /// Sets a new central frequency.
-    pub fn set_central_frequency(&mut self, f: MathT) {
+    pub fn set_central_frequency(&mut self, f: Math) {
         self.central_f = f;
 
         self.reset();
     }
 
     /// Returns the quality of the filter.
-    pub fn get_quality(&self) -> MathT {
+    pub fn get_quality(&self) -> Math {
         self.quality
     }
 
@@ -79,31 +79,31 @@ impl BandPass {
     ///
     /// The filter's quality is set to the central frequency divided by the
     /// difference between the corner frequencies.
-    pub fn set_quality(&mut self, q: MathT) {
+    pub fn set_quality(&mut self, q: Math) {
         self.quality = q;
 
         self.reset();
     }
 
     /// Returns the corner frequencies of the filter.
-    pub fn get_corner_frequencies(&self) -> (MathT, MathT) {
-        let b = -self.central_f / self.quality;
+    pub fn get_corner_frequencies(&self) -> (Math, Math) {
+        let b = -self.central_f.0 / self.quality.0;
 
-        let (p, n) = quadratic(1.0, b, -self.central_f * self.central_f);
+        let (p, n) = quadratic(1.0, b, -self.central_f.0 * self.central_f.0);
         let fl = if p > 0.0 { p } else { n };
         let fh = fl + b;
 
         if fl < fh {
-            (fl, fh)
+            (fl.into(), fh.into())
         } else {
-            (fh, fl)
+            (fh.into(), fl.into())
         }
     }
 
     /// Sets the corner frequencies of the filter.
-    pub fn set_corner_frequencies(&mut self, f: (MathT, MathT)) {
-        self.central_f = (f.0 * f.1).sqrt();
-        self.quality = self.central_f / (f.0 - f.1).abs();
+    pub fn set_corner_frequencies(&mut self, f: (Math, Math)) {
+        self.central_f = (f.0 .0 * f.1 .0).sqrt().into();
+        self.quality = (self.central_f.0 / (f.0 .0 - f.1 .0).abs()).into();
 
         self.reset();
     }
@@ -111,8 +111,8 @@ impl BandPass {
     fn reset(&mut self) {
         let (fh, fl) = self.get_corner_frequencies();
 
-        let theta_l = (std::f64::consts::PI * fl / self.sample_rate).tan();
-        let theta_h = (std::f64::consts::PI * fh / self.sample_rate).tan();
+        let theta_l = (std::f64::consts::PI * fl.0 / self.sample_rate.0).tan();
+        let theta_h = (std::f64::consts::PI * fh.0 / self.sample_rate.0).tan();
 
         let al = 1.0 / (1.0 + theta_l);
         let ah = 1.0 / (1.0 + theta_h);
@@ -120,16 +120,16 @@ impl BandPass {
         let bl = (1.0 - theta_l) / (1.0 + theta_l);
         let bh = (1.0 - theta_h) / (1.0 + theta_h);
 
-        self.coeffs[0] = (1.0 - al) * ah;
-        self.coeffs[1] = bl + bh;
-        self.coeffs[2] = bl * bh;
+        self.coeffs[0] = ((1.0 - al) * ah).into();
+        self.coeffs[1] = (bl + bh).into();
+        self.coeffs[2] = (bl * bh).into();
     }
 }
 
 impl Modifier for BandPass {
-    fn process(&mut self, x: SampleT) -> SampleT {
-        let y = (self.coeffs[0] * (x - self.xn[1]) as MathT + self.coeffs[1] * self.yn[0] as MathT
-            - self.coeffs[2] * self.yn[1] as MathT) as SampleT;
+    fn process(&mut self, x: Sample) -> Sample {
+        let y = ((self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath + self.coeffs[1].0 * self.yn[0].0 as AccurateMath
+            - self.coeffs[2].0 * self.yn[1].0 as AccurateMath) as FastMath).into();
 
         self.xn.rotate_right(1);
         self.xn[0] = x;
@@ -140,7 +140,7 @@ impl Modifier for BandPass {
     }
 }
 
-fn quadratic(a: MathT, b: MathT, c: MathT) -> (MathT, MathT) {
+fn quadratic(a: AccurateMath, b: AccurateMath, c: AccurateMath) -> (AccurateMath, AccurateMath) {
     (
         (-b + (b * b - 4.0 * a * c).sqrt()) / (2.0 * a),
         (-b - (b * b - 4.0 * a * c).sqrt()) / (2.0 * a),

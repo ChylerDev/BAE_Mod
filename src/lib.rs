@@ -41,5 +41,5 @@ pub trait Modifier {
     /// # Parameters
     ///
     /// * `x` - The "dry" audio sample before filtering.
-    fn process(&mut self, x: SampleT) -> SampleT;
+    fn process(&mut self, x: Sample) -> Sample;
 }

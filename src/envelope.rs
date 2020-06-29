@@ -5,15 +5,15 @@ use super::*;
 /// Envelope Follower filter. I don't remember my lectures well enough to write
 /// a detailed description.
 pub struct Envelope {
-    sample_rate: MathT,
+    sample_rate: Math,
 
-    au: SampleT,
-    bu: SampleT,
-    ad: SampleT,
-    bd: SampleT,
+    au: Sample,
+    bu: Sample,
+    ad: Sample,
+    bd: Sample,
 
-    x1: SampleT,
-    y1: SampleT,
+    x1: Sample,
+    y1: Sample,
 }
 
 impl Envelope {
@@ -21,31 +21,33 @@ impl Envelope {
     /// to follow.
     ///
     /// [`Envelope`]: struct.Envelope.html
-    pub fn new(lower: MathT, upper: MathT, sample_rate: MathT) -> Envelope {
-        let theta_u = (std::f64::consts::PI * upper / sample_rate).tan();
-        let theta_d = (std::f64::consts::PI * lower / sample_rate).tan();
+    pub fn new(lower: Math, upper: Math, sample_rate: Math) -> Envelope {
+        let theta_u = (std::f64::consts::PI * upper.0 / sample_rate.0).tan();
+        let theta_d = (std::f64::consts::PI * lower.0 / sample_rate.0).tan();
 
         Envelope {
             sample_rate,
 
-            au: (theta_u / (1.0 + theta_u)) as SampleT,
-            bu: ((1.0 - theta_u) / (1.0 + theta_u)) as SampleT,
-            ad: (theta_d / (1.0 + theta_d)) as SampleT,
-            bd: ((1.0 - theta_d) / (1.0 + theta_d)) as SampleT,
+            au: Sample((theta_u / (1.0 + theta_u)) as FastMath),
+            bu: Sample(((1.0 - theta_u) / (1.0 + theta_u)) as FastMath),
+            ad: Sample((theta_d / (1.0 + theta_d)) as FastMath),
+            bd: Sample(((1.0 - theta_d) / (1.0 + theta_d)) as FastMath),
 
-            x1: SampleT::default(),
-            y1: SampleT::default(),
+            x1: Sample::default(),
+            y1: Sample::default(),
         }
     }
 }
 
 impl Modifier for Envelope {
-    fn process(&mut self, x: SampleT) -> SampleT {
-        let y = if x.abs() > self.y1 {
-            self.au * (x.abs() + self.x1.abs()) + self.bu * self.y1
-        } else {
-            self.ad * (x.abs() + self.x1.abs()) + self.bd * self.y1
-        };
+    fn process(&mut self, x: Sample) -> Sample {
+        let y = Sample(
+            if x.0.abs() > self.y1.0 {
+                self.au.0 * (x.0.abs() + self.x1.0.abs()) + self.bu.0 * self.y1.0
+            } else {
+                self.ad.0 * (x.0.abs() + self.x1.0.abs()) + self.bd.0 * self.y1.0
+            }
+        );
 
         self.y1 = y;
         self.x1 = x;

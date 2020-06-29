@@ -22,15 +22,15 @@ pub enum ADSRState {
 ///
 /// Creates a simple envelope for the given signal.
 pub struct ADSR {
-    a: MathT,
-    d: MathT,
-    s: MathT,
-    r: MathT,
+    a: Math,
+    d: Math,
+    s: Math,
+    r: Math,
 
-    sample_rate: MathT,
+    sample_rate: Math,
 
     state: ADSRState,
-    g: MathT,
+    g: Math,
 }
 
 impl ADSR {
@@ -43,13 +43,13 @@ impl ADSR {
     /// * `s` - Sustain level in dBFS. Value is clamped to be less than 0.
     /// * `r` - Release time.
     /// * `sample_rate` - Sample rate of the engine.
-    pub fn new(a: Duration, d: Duration, s: MathT, r: Duration, sample_rate: MathT) -> Self {
-        let s = s.min(0.0);
+    pub fn new(a: Duration, d: Duration, s: Math, r: Duration, sample_rate: Math) -> Self {
+        let s = s.0.min(0.0).into();
         ADSR {
-            a: 1.0 / (a.as_secs_f64() * sample_rate),
-            d: ((db_to_linear(s) - 1.0) / (d.as_secs_f64() * sample_rate)),
+            a: (1.0 / (a.as_secs_f64() * sample_rate.0)).into(),
+            d: ((db_to_linear(s).0 - 1.0) / (d.as_secs_f64() * sample_rate.0)).into(),
             s: db_to_linear(s),
-            r: ((-db_to_linear(s)) / (r.as_secs_f64() * sample_rate)),
+            r: ((-db_to_linear(s).0) / (r.as_secs_f64() * sample_rate.0)).into(),
             sample_rate,
             state: ADSRState::Attack,
             g: Default::default(),
@@ -58,24 +58,24 @@ impl ADSR {
 
     /// Sets the attack time.
     pub fn attack(&mut self, a: Duration) {
-        self.a = 1.0 / (a.as_secs_f64() * self.sample_rate);
+        self.a.0 = 1.0 / (a.as_secs_f64() * self.sample_rate.0);
     }
 
     /// Sets the decay time.
     pub fn decay(&mut self, d: Duration) {
-        self.d = (self.s as MathT - 1.0) / (d.as_secs_f64() * self.sample_rate);
+        self.d.0 = (self.s.0 - 1.0) / (d.as_secs_f64() * self.sample_rate.0);
     }
 
     /// Sets the sustain level in dBFS.
-    pub fn sustain(&mut self, s: MathT) {
-        self.d *= (db_to_linear(s) - 1.0) / (self.s as MathT - 1.0);
-        self.r *= db_to_linear(s) / self.s as MathT;
-        self.s = db_to_linear(s);
+    pub fn sustain(&mut self, s: Math) {
+        self.d.0 *= (db_to_linear(s).0 - 1.0) / (self.s.0 - 1.0);
+        self.r.0 *= db_to_linear(s).0 / self.s.0;
+        self.s.0 = db_to_linear(s).0;
     }
 
     /// Sets the release time.
     pub fn release(&mut self, r: Duration) {
-        self.r = -self.s as MathT / (r.as_secs_f64() * self.sample_rate);
+        self.r.0 = -self.s.0 / (r.as_secs_f64() * self.sample_rate.0);
     }
 
     /// Changes state to release
@@ -85,37 +85,37 @@ impl ADSR {
 }
 
 impl Modifier for ADSR {
-    fn process(&mut self, x: SampleT) -> SampleT {
+    fn process(&mut self, x: Sample) -> Sample {
         match self.state {
             ADSRState::Attack => {
-                self.g += self.a;
-                if self.g >= 1.0 {
+                self.g.0 += self.a.0;
+                if self.g.0 >= 1.0 {
                     self.state = ADSRState::Decay;
-                    self.g = 1.0;
+                    self.g.0 = 1.0;
                 }
 
-                x * self.g as SampleT
+                (x.0 * self.g.0 as FastMath).into()
             }
             ADSRState::Decay => {
-                self.g += self.d;
+                self.g.0 += self.d.0;
                 if self.g <= self.s {
                     self.state = ADSRState::Sustain;
                     self.g = self.s;
                 }
 
-                x * self.g as SampleT
+                (x.0 * self.g.0 as FastMath).into()
             }
-            ADSRState::Sustain => x * self.g as SampleT,
+            ADSRState::Sustain => (x.0 * self.g.0 as FastMath).into(),
             ADSRState::Release => {
-                self.g += self.r;
-                if self.g <= 0.0 {
+                self.g.0 += self.r.0;
+                if self.g.0 <= 0.0 {
                     self.state = ADSRState::Stopped;
-                    self.g = 0.0;
+                    self.g.0 = 0.0;
                 }
 
-                x * self.g as SampleT
+                (x.0 * self.g.0 as FastMath).into()
             }
-            ADSRState::Stopped => SampleT::default(),
+            ADSRState::Stopped => Sample::default(),
         }
     }
 }

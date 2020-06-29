@@ -7,21 +7,21 @@ use std::time::Duration;
 /// Delay modifier, delays a signal by a given amount of time rounded to the
 /// nearest sample.
 pub struct Delay {
-    sample_rate: MathT,
-    delay: VecDeque<SampleT>,
+    sample_rate: Math,
+    delay: VecDeque<Sample>,
 }
 
 impl Delay {
     /// Creates a new Delay object from the given duration rounded to the
     /// nearest sample.
-    pub fn new(d: Duration, sample_rate: MathT) -> Self {
+    pub fn new(d: Duration, sample_rate: Math) -> Self {
         Delay {
             sample_rate,
             delay: {
                 let mut v = VecDeque::new();
 
-                for _ in 0..((d.as_secs_f64() * sample_rate as MathT).round() as usize) {
-                    v.push_back(SampleT::default());
+                for _ in 0..((d.as_secs_f64() * sample_rate.0).round() as usize) {
+                    v.push_back(Sample::default());
                 }
 
                 v
@@ -31,12 +31,12 @@ impl Delay {
 
     /// Returns the delay of the Modifier in a Duration value.
     pub fn get_delay(&self) -> Duration {
-        Duration::from_secs_f64(self.delay.len() as MathT / self.sample_rate)
+        Duration::from_secs_f64(self.delay.len() as AccurateMath / self.sample_rate.0)
     }
 }
 
 impl Modifier for Delay {
-    fn process(&mut self, x: SampleT) -> SampleT {
+    fn process(&mut self, x: Sample) -> Sample {
         self.delay.push_back(x);
 
         self.delay.pop_front().unwrap()
@@ -50,8 +50,8 @@ impl Clone for Delay {
             delay: {
                 let mut v = VecDeque::new();
 
-                for _ in 0..(self.delay.len() * self.sample_rate as usize) {
-                    v.push_back(SampleT::default());
+                for _ in 0..(self.delay.len() * self.sample_rate.0 as usize) {
+                    v.push_back(Sample::default());
                 }
 
                 v

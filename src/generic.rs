@@ -6,17 +6,17 @@ use std::collections::VecDeque;
 /// Alias for a [`VecDeque`] describing a list of zeros for a filter.
 ///
 /// [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
-pub type Zeros = VecDeque<(usize, SampleT)>;
+pub type Zeros = VecDeque<(usize, Sample)>;
 
 /// Alias for a [`VecDeque`] describing a list of poles for a filter.
 ///
 /// [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
-pub type Poles = VecDeque<(usize, SampleT)>;
+pub type Poles = VecDeque<(usize, Sample)>;
 
 /// Alias for a [`VecDeque`] describing a list of samples for a filter.
 ///
 /// [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
-pub type Samples = VecDeque<SampleT>;
+pub type Samples = VecDeque<Sample>;
 
 /// Generic filter object.
 pub struct Generic {
@@ -45,14 +45,14 @@ impl Generic {
             inputs: {
                 let mut v = Samples::new();
                 for _ in 0..z_back {
-                    v.push_back(SampleT::default());
+                    v.push_back(Sample::default());
                 }
                 v
             },
             outputs: {
                 let mut v = Samples::new();
                 for _ in 0..p_back {
-                    v.push_back(SampleT::default());
+                    v.push_back(Sample::default());
                 }
                 v
             },
@@ -61,17 +61,17 @@ impl Generic {
 }
 
 impl Modifier for Generic {
-    fn process(&mut self, x: SampleT) -> SampleT {
-        let mut y = SampleT::default();
+    fn process(&mut self, x: Sample) -> Sample {
+        let mut y = Sample::default();
 
         self.inputs.push_front(x);
         self.inputs.pop_back();
 
         for z in &self.zeros {
-            y += self.inputs[z.0] * z.1;
+            y.0 += self.inputs[z.0].0 * z.1 .0;
         }
         for p in &self.poles {
-            y += self.outputs[p.0] * p.1;
+            y.0 += self.outputs[p.0].0 * p.1 .0;
         }
 
         self.outputs.push_front(y);
@@ -89,14 +89,14 @@ impl Clone for Generic {
             inputs: {
                 let mut v = Samples::new();
                 for _ in 0..self.inputs.len() {
-                    v.push_back(SampleT::default());
+                    v.push_back(Sample::default());
                 }
                 v
             },
             outputs: {
                 let mut v = Samples::new();
                 for _ in 0..self.outputs.len() {
-                    v.push_back(SampleT::default());
+                    v.push_back(Sample::default());
                 }
                 v
             },
