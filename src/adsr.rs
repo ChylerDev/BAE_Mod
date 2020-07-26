@@ -120,6 +120,43 @@ impl Modifier for ADSR {
     }
 }
 
+impl BlockModifier for ADSR {
+    fn process_block(&mut self, x_in: &[Sample], y_out: &mut[Sample]) {
+        for (x, y) in x_in.iter().zip(y_out.iter_mut()) {
+            if self.state == ADSRState::Stopped {
+                *y = Sample::default();
+                continue;
+            }
+            match self.state {
+                ADSRState::Attack => {
+                    self.g.0 += self.a.0;
+                    if self.g.0 >= 1.0 {
+                        self.state = ADSRState::Decay;
+                        self.g.0 = 1.0;
+                    }
+                },
+                ADSRState::Decay => {
+                    self.g.0 += self.d.0;
+                    if self.g <= self.s {
+                        self.state = ADSRState::Sustain;
+                        self.g = self.s;
+                    }
+                },
+                ADSRState::Release => {
+                    self.g.0 += self.r.0;
+                    if self.g.0 <= 0.0 {
+                        self.state = ADSRState::Stopped;
+                        self.g.0 = 0.0;
+                    }
+                },
+                _ => (),
+            };
+
+            *y = (x.0 * self.g.0 as FastMath).into();
+        }
+    }
+}
+
 impl Clone for ADSR {
     fn clone(&self) -> Self {
         ADSR {

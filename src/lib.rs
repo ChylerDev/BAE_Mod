@@ -43,3 +43,16 @@ pub trait Modifier {
     /// * `x` - The "dry" audio sample before filtering.
     fn process(&mut self, x: Sample) -> Sample;
 }
+
+/// The `BlockModifier` trait defines types that filter audio samples in blocks,
+/// or chunks.
+pub trait BlockModifier {
+    /// Filters the given chunk of audio samples.
+    ///
+    /// # Parameters
+    ///
+    /// * `x` - The "dry" audio samples before filtering.
+    /// * `y` - The mutable slice that will store the filtered samples. This
+    ///         slice must be at minimum the same size as `x`.
+    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]);
+}

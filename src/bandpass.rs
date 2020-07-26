@@ -140,6 +140,25 @@ impl Modifier for BandPass {
     }
 }
 
+impl BlockModifier for BandPass {
+    fn process_block(&mut self, x_in: &[Sample], y_out: &mut[Sample]) {
+        for (x, y) in x_in.iter().zip(y_out.iter_mut()) {
+            *y = (
+                (
+                    self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath +
+                    self.coeffs[1].0 * self.yn[0].0 as AccurateMath -
+                    self.coeffs[2].0 * self.yn[1].0 as AccurateMath
+                ) as FastMath
+            ).into();
+
+            self.xn.rotate_right(1);
+            self.xn[0] = *x;
+            self.yn.rotate_right(1);
+            self.yn[0] = *y;
+        }
+    }
+}
+
 fn quadratic(a: AccurateMath, b: AccurateMath, c: AccurateMath) -> (AccurateMath, AccurateMath) {
     (
         (-b + (b * b - 4.0 * a * c).sqrt()) / (2.0 * a),

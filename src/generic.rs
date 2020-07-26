@@ -81,6 +81,27 @@ impl Modifier for Generic {
     }
 }
 
+impl BlockModifier for Generic {
+    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+        for (x,y) in x.iter().zip(y.iter_mut()) {
+            *y = Sample::default();
+
+            self.inputs.push_front(*x);
+            self.inputs.pop_back();
+
+            for z in &self.zeros {
+                y.0 += self.inputs[z.0].0 * z.1 .0;
+            }
+            for p in &self.poles {
+                y.0 += self.outputs[p.0].0 * p.1 .0;
+            }
+
+            self.outputs.push_front(*y);
+            self.outputs.pop_back();
+        }
+    }
+}
+
 impl Clone for Generic {
     fn clone(&self) -> Self {
         Generic {

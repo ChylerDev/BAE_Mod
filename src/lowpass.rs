@@ -101,6 +101,22 @@ impl Modifier for LowPass {
     }
 }
 
+impl BlockModifier for LowPass {
+    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+        for (x, y) in x.iter().zip(y.iter_mut()) {
+            *y = (
+                self.coeff[0].0 * x.0
+                + self.coeff[1].0 * self.yn[0].0
+                + self.coeff[2].0 * self.yn[1].0
+                + self.coeff[3].0 * self.yn[2].0
+            ).into();
+
+            self.yn.rotate_right(1);
+            self.yn[0] = *y;
+        }
+    }
+}
+
 impl Clone for LowPass {
     fn clone(&self) -> Self {
         LowPass {
