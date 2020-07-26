@@ -32,9 +32,6 @@ pub use lowpass::*;
 pub use passthrough::*;
 
 /// The `Modifier` trait defines types that filter audio samples.
-///
-/// [`Modifier`]: trait.Modifier.html
-/// [`Clone`]: https://doc.rust-lang.org/std/clone/trait.Clone.html
 pub trait Modifier {
     /// Filters the given audio sample.
     ///
