@@ -5,6 +5,7 @@ use super::*;
 use std::time::Duration;
 
 /// Enum of the states an ADSR filter exists in.
+#[derive(PartialOrd, PartialEq)] #[repr(C)]
 pub enum ADSRState {
     /// Attack state.
     Attack,
