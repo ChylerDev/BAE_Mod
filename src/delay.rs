@@ -44,7 +44,7 @@ impl Modifier for Delay {
 }
 
 impl BlockModifier for Delay {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
         for (x, y) in x.iter().zip(y.iter_mut()) {
             self.delay.push_back(*x);
             *y = self.delay.pop_front().unwrap();

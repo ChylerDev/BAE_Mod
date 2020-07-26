@@ -82,8 +82,8 @@ impl Modifier for Generic {
 }
 
 impl BlockModifier for Generic {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
-        for (x,y) in x.iter().zip(y.iter_mut()) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
+        for (x, y) in x.iter().zip(y.iter_mut()) {
             *y = Sample::default();
 
             self.inputs.push_front(*x);

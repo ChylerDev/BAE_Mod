@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use bae_mod::*;
     use bae_gen::*;
+    use bae_mod::*;
     use bae_types::*;
     use bae_utils::*;
 
@@ -64,10 +64,7 @@ mod tests {
 
     #[test]
     fn test_delay() {
-        let mut d = Delay::new(
-            std::time::Duration::from_secs_f64(0.5),
-            SAMPLE_RATE as Math,
-        );
+        let mut d = Delay::new(std::time::Duration::from_secs_f64(0.5), SAMPLE_RATE as Math);
 
         run_modifier(&mut d, "delay.wav").unwrap();
     }

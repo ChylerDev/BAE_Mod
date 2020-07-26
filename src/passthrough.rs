@@ -20,7 +20,7 @@ impl Modifier for Passthrough {
 }
 
 impl BlockModifier for Passthrough {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
         for (x, y) in x.iter().zip(y.iter_mut()) {
             *y = *x;
         }

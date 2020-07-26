@@ -97,15 +97,14 @@ impl HighPass {
 
 impl Modifier for HighPass {
     fn process(&mut self, x: Sample) -> Sample {
-        let y = (
-            self.an[0].0 * x.0
+        let y = (self.an[0].0 * x.0
             + self.an[1].0 * self.xn[0].0
             + self.an[2].0 * self.xn[1].0
             + self.an[3].0 * self.xn[2].0
             + self.bn[0].0 * self.yn[0].0
             + self.bn[1].0 * self.yn[1].0
-            + self.bn[2].0 * self.yn[2].0
-        ).into();
+            + self.bn[2].0 * self.yn[2].0)
+            .into();
 
         self.xn.rotate_right(1);
         self.xn[0] = x;
@@ -117,17 +116,16 @@ impl Modifier for HighPass {
 }
 
 impl BlockModifier for HighPass {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
         for (x, y) in x.iter().zip(y.iter_mut()) {
-            *y = (
-                self.an[0].0 * x.0
+            *y = (self.an[0].0 * x.0
                 + self.an[1].0 * self.xn[0].0
                 + self.an[2].0 * self.xn[1].0
                 + self.an[3].0 * self.xn[2].0
                 + self.bn[0].0 * self.yn[0].0
                 + self.bn[1].0 * self.yn[1].0
-                + self.bn[2].0 * self.yn[2].0
-            ).into();
+                + self.bn[2].0 * self.yn[2].0)
+                .into();
 
             self.xn.rotate_right(1);
             self.xn[0] = *x;

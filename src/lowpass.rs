@@ -87,12 +87,11 @@ impl LowPass {
 
 impl Modifier for LowPass {
     fn process(&mut self, x: Sample) -> Sample {
-        let y = (
-            self.coeff[0].0 * x.0
+        let y = (self.coeff[0].0 * x.0
             + self.coeff[1].0 * self.yn[0].0
             + self.coeff[2].0 * self.yn[1].0
-            + self.coeff[3].0 * self.yn[2].0
-        ).into();
+            + self.coeff[3].0 * self.yn[2].0)
+            .into();
 
         self.yn.rotate_right(1);
         self.yn[0] = y;
@@ -102,14 +101,13 @@ impl Modifier for LowPass {
 }
 
 impl BlockModifier for LowPass {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
         for (x, y) in x.iter().zip(y.iter_mut()) {
-            *y = (
-                self.coeff[0].0 * x.0
+            *y = (self.coeff[0].0 * x.0
                 + self.coeff[1].0 * self.yn[0].0
                 + self.coeff[2].0 * self.yn[1].0
-                + self.coeff[3].0 * self.yn[2].0
-            ).into();
+                + self.coeff[3].0 * self.yn[2].0)
+                .into();
 
             self.yn.rotate_right(1);
             self.yn[0] = *y;

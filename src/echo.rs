@@ -48,8 +48,8 @@ impl Modifier for Echo {
 }
 
 impl BlockModifier for Echo {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
-        for (x,y) in x.iter().zip(y.iter_mut()) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
+        for (x, y) in x.iter().zip(y.iter_mut()) {
             *y = (self.delay.pop_front().unwrap().0 * self.gain.0 + x.0).into();
             self.delay.push_back(*y);
         }

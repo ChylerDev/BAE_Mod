@@ -41,13 +41,11 @@ impl Envelope {
 
 impl Modifier for Envelope {
     fn process(&mut self, x: Sample) -> Sample {
-        let y = Sample(
-            if x.0.abs() > self.y1.0 {
-                self.au.0 * (x.0.abs() + self.x1.0.abs()) + self.bu.0 * self.y1.0
-            } else {
-                self.ad.0 * (x.0.abs() + self.x1.0.abs()) + self.bd.0 * self.y1.0
-            }
-        );
+        let y = Sample(if x.0.abs() > self.y1.0 {
+            self.au.0 * (x.0.abs() + self.x1.0.abs()) + self.bu.0 * self.y1.0
+        } else {
+            self.ad.0 * (x.0.abs() + self.x1.0.abs()) + self.bd.0 * self.y1.0
+        });
 
         self.y1 = y;
         self.x1 = x;
@@ -57,15 +55,13 @@ impl Modifier for Envelope {
 }
 
 impl BlockModifier for Envelope {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
-        for (x,y) in x.iter().zip(y.iter_mut()) {
-            *y = Sample(
-                if x.0.abs() > self.y1.0 {
-                    self.au.0 * (x.0.abs() + self.x1.0.abs()) + self.bu.0 * self.y1.0
-                } else {
-                    self.ad.0 * (x.0.abs() + self.x1.0.abs()) + self.bd.0 * self.y1.0
-                }
-            );
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
+        for (x, y) in x.iter().zip(y.iter_mut()) {
+            *y = Sample(if x.0.abs() > self.y1.0 {
+                self.au.0 * (x.0.abs() + self.x1.0.abs()) + self.bu.0 * self.y1.0
+            } else {
+                self.ad.0 * (x.0.abs() + self.x1.0.abs()) + self.bd.0 * self.y1.0
+            });
 
             self.y1 = *y;
             self.x1 = *x;

@@ -25,8 +25,8 @@ impl Modifier for Gain {
 }
 
 impl BlockModifier for Gain {
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]) {
-        for (x,y) in x.iter().zip(y.iter_mut()) {
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]) {
+        for (x, y) in x.iter().zip(y.iter_mut()) {
             *y = (x.0 * self.a.0).into()
         }
     }

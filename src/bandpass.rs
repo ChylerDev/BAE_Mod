@@ -128,8 +128,10 @@ impl BandPass {
 
 impl Modifier for BandPass {
     fn process(&mut self, x: Sample) -> Sample {
-        let y = ((self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath + self.coeffs[1].0 * self.yn[0].0 as AccurateMath
-            - self.coeffs[2].0 * self.yn[1].0 as AccurateMath) as FastMath).into();
+        let y = ((self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath
+            + self.coeffs[1].0 * self.yn[0].0 as AccurateMath
+            - self.coeffs[2].0 * self.yn[1].0 as AccurateMath) as FastMath)
+            .into();
 
         self.xn.rotate_right(1);
         self.xn[0] = x;
@@ -141,15 +143,12 @@ impl Modifier for BandPass {
 }
 
 impl BlockModifier for BandPass {
-    fn process_block(&mut self, x_in: &[Sample], y_out: &mut[Sample]) {
+    fn process_block(&mut self, x_in: &[Sample], y_out: &mut [Sample]) {
         for (x, y) in x_in.iter().zip(y_out.iter_mut()) {
-            *y = (
-                (
-                    self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath +
-                    self.coeffs[1].0 * self.yn[0].0 as AccurateMath -
-                    self.coeffs[2].0 * self.yn[1].0 as AccurateMath
-                ) as FastMath
-            ).into();
+            *y = ((self.coeffs[0].0 * (x.0 - self.xn[1].0) as AccurateMath
+                + self.coeffs[1].0 * self.yn[0].0 as AccurateMath
+                - self.coeffs[2].0 * self.yn[1].0 as AccurateMath) as FastMath)
+                .into();
 
             self.xn.rotate_right(1);
             self.xn[0] = *x;

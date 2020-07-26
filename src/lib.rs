@@ -51,5 +51,5 @@ pub trait BlockModifier {
     /// * `x` - The "dry" audio samples before filtering.
     /// * `y` - The mutable slice that will store the filtered samples. This
     ///         slice must be at minimum the same size as `x`.
-    fn process_block(&mut self, x: &[Sample], y: &mut[Sample]);
+    fn process_block(&mut self, x: &[Sample], y: &mut [Sample]);
 }
